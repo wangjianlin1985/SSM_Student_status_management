@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.java.dao.GradeDao">  
+
+    <resultMap id="BaseResultMap" type="com.java.entity.Grade">  
+    	<result column="id" property="id" />  
+   		<result column="studentNo" property="studentNo" /> 
+       	<result column="subjectId" property="subjectId" /> 
+       	<result column="score" property="score" /> 
+       	<association property="student" javaType="com.java.entity.Student">
+        	<result column="studentName" property="studentName" /> 
+        	<result column="studentNo" property="studentNo" /> 
+        </association>
+        <association property="subject" javaType="com.java.entity.Subject">
+        	<result column="id" property="id" /> 
+        	<result column="subjectName" property="subjectName" /> 
+        </association>
+    </resultMap>  
+    
+    <select id="getGradeList" resultMap="BaseResultMap">  
+		SELECT  s.studentName, s.studentNo, g.score,su.subjectName ,su.id FROM student s INNER JOIN	grade g ON s.studentNo=g.studentNo INNER JOIN SUBJECT su ON g.subjectId =su.id WHERE subjectId IN (SELECT g.subjectId FROM grade g WHERE g.studentNo = #{studentNo}) AND s.studentNo = #{studentNo}
+  	</select>
+  	
+  	<select id="getGradeState" resultMap="BaseResultMap">
+  		SELECT score FROM grade WHERE studentNo = #{studentNo}
+  	</select>
+  	
+  	<select id="exitGrade" resultType="integer">
+  		SELECT count(score) FROM grade WHERE  subjectId IN(SELECT id FROM SUBJECT s WHERE subjectName IN ("高数","大学英语","体育","思想政治理论")) AND studentNo = #{studentNo}
+  	</select>
+  	
+  	<update id="updateGrade">
+  		update grade set score =#{grade.score} where subjectId =  #{grade.subjectId} and studentNo = #{grade.studentNo}
+  	</update>
+  	
+    
+	<insert id="addGrade">
+		insert into grade values (null,#{grade.studentNo},#{grade.subjectId},#{grade.score})
+	</insert>
+	
+	<delete id="deleteGrade">
+		delete from grade  where studentNo = #{studentNo}
+	</delete>
+ 	
+</mapper>  

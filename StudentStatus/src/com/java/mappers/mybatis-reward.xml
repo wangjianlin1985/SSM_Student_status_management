@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.java.dao.RewardDao">  
+
+    <resultMap id="BaseResultMap" type="com.java.entity.Reward">  
+    	<result column="id" property="id" />  
+   		<result column="studentNo" property="studentNo" /> 
+       	<result column="deptNo" property="deptNo" /> 
+       	<result column="rewardInfo" property="rewardInfo"/>
+       	<association property="student" javaType="com.java.entity.Student">
+        	<result column="studentName" property="studentName" /> 
+        </association>
+        
+        <association property="dept" javaType="com.java.entity.Dept">
+        	<result column="deptName" property="deptName" /> 
+        </association>
+    </resultMap>  
+    
+    <select id="getRewardList" resultMap="BaseResultMap">  
+    	select * from reward r ,dept d,student s where r.studentNo = s.studentNo and
+    	r.deptNo = d.deptNo
+    	<if test ="reward!=null">
+   			and r.studentNo = #{reward.studentNo}
+    	</if>
+    	<if test ="pageBean !=null">
+   			limit #{pageBean.start} ,#{pageBean.rows}
+    	</if>
+  	</select>
+  	
+  	<select id="getRewardListCount" resultType="int">  
+    	select count(*) from reward r ,dept d,student s where r.studentNo = s.studentNo and
+    	r.deptNo = d.deptNo
+  	</select>
+  	
+  	
+  	<insert id="rewardAdd" parameterType="reward">
+  		insert into reward values(null,
+  		#{reward.studentNo},
+  		#{reward.deptNo},
+  		#{reward.rewardInfo})
+  	</insert>
+  	
+  	<update id="rewardUpdate">
+  		update reward set rewardInfo=#{rewardInfo} where id = #{id}
+  	</update>
+  	
+	<delete id="rewardDelete">
+    	delete from reward where studentNo = #{studentNo} 	
+    </delete>
+  	
+    
+
+ 	
+</mapper>  

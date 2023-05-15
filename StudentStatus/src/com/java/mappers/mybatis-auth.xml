@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.java.dao.AuthDao">  
+    <resultMap id="BaseResultMap" type="com.java.entity.Auth">  
+    	<result column="authId" property="authId"/>
+        <result column="authName" property="authName" />  
+        <result column="authPath" property="authPath" />  
+        <result column="parentId" property="parentId"/>
+        <result column="authDescription" property="authDescription" /> 
+        <result column="state" property="state" /> 
+        <result column="iconCls" property="iconCls" /> 
+    </resultMap>  
+
+  
+  <select id="getAuthByParentId" resultMap="BaseResultMap">  
+    select * from auth where parentId = #{parentId} and authId in 
+    <foreach collection="authIds" open="(" close=")" separator="," item="authid">
+		<if test="authid!=''">
+			#{authid}
+		</if>    	
+    </foreach>  
+  </select>  
+  
+  <select id="getTreeGridAuthByParentId" resultMap="BaseResultMap">  
+    select * from auth where parentId = #{parentId}  
+  </select>  
+  
+  <select id="isLeaf" resultType="Integer">
+  	select count(*) from auth where parentId = #{authId}
+  </select>
+  
+  <select id="getAuthCountByParentId" resultType="int">
+  	  select count(*) as total from auth where parentId=#{parentId}
+  </select>
+  
+  <select id="getCheckedAuth" resultMap="BaseResultMap">  
+    select * from auth where parentId=#{parentId}
+  </select> 
+  
+  
+  <insert id="authAdd">
+  	insert into auth values(null,
+  	#{auth.authName},
+  	#{auth.authPath},
+  	#{auth.parentId},
+  	#{auth.authDescription},'open',
+  	#{auth.iconCls})
+  </insert>
+  
+  <update id="authUpdate">
+  	update auth set authName=#{auth.authName},
+  	authPath=#{auth.authPath},
+  	authDescription=#{auth.authDescription},
+  	iconCls=#{auth.iconCls}
+  	where authId=#{auth.authId}
+  </update>
+  
+  
+  <update id="updateStateByAuthId">
+  	update auth set state=#{state} where authId=#{authId}
+  </update>
+  
+  <delete id="authDelete">
+  	delete from auth where authId=#{authId}
+  </delete>
+  
+</mapper>  

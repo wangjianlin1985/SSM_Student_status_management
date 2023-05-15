@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.java.dao.UserDao">  
+
+    <resultMap id="BaseResultMap" type="com.java.entity.User">  
+    	<result column="id" property="id" />  
+        <result column="userName" property="userName" />  
+        <result column="password" property="password" />  
+        <result column="roleId" property="roleId" /> 
+        <association property="role" javaType="com.java.entity.Role">
+        	<result column="roleName" property="roleName" /> 
+        </association>
+       
+    </resultMap>  
+    
+    <select id="getUserList" resultMap="BaseResultMap">  
+    	select * from user u ,role r where u.roleId=r.roleId and u.userType!=1
+   		<if test ="user !=null and user.userName!=null">
+   			and u.userName like CONCAT(CONCAT('%',#{user.userName},'%'))
+    	</if>
+    	<if test ="user!=null and user.roleId != -1 and user.roleId !=null">
+   			and u.roleId = #{user.roleId}
+    	</if>
+    	<if test ="pageBean !=null">
+   			limit #{pageBean.start} ,#{pageBean.rows}
+    	</if>
+  	</select>
+  	
+  	<select id="login" resultMap="BaseResultMap">
+  		select * from user where userName=#{user.userName} and password=#{user.password}
+  	</select>
+  	
+  	<select id="getUserCount" resultType="int">  
+    	select count(*) as total from user u ,role r where u.roleId =r.roleId and u.userType!=1
+   		<if test ="user !=null">
+   			and u.userName like CONCAT(CONCAT('%',#{user.userName},'%'))
+    	</if>
+    	<if test ="user!=null and user.roleId != -1">
+   			and u.roleId = #{user.roleId}
+    	</if>
+    </select>
+    
+    <select id="existUserWithuserName" resultType="Integer">  
+    	select * from user where userName = #{name}
+    </select>
+    
+    <select id="existUserWithRoleId" resultType="Integer">  
+    	select count(*) from user where roleId = #{roleId}
+    </select>
+    
+    <update id="updateUser" parameterType="user">
+    	update user set 
+    	userName=#{user.userName},
+    	password=#{user.password},
+    	roleId=#{user.roleId} where id=#{user.id}
+    </update>
+    
+    <update id="modifyPassword" parameterType="user">
+    	update user set 
+    	password=#{user.password}
+    	where id=#{user.id}
+    </update>
+    
+    
+    <insert id="addUser" parameterType="user">
+    	insert into user values(null,#{user.userName},#{user.password},2,#{user.roleId})
+    </insert>
+    
+    <delete id="deleteUser">
+    	delete from user where id in 
+		<foreach collection="userIds" open="(" close=")" separator="," item="userid">
+		<if test="userid!=''">
+			#{userid}
+		</if>    	
+    </foreach> 
+    </delete>
+ 	
+</mapper>  

@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>成绩管理</title>
+<link rel="stylesheet" type="text/css" href="jquery-easyui-1.3.3/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="jquery-easyui-1.3.3/themes/icon.css">
+<script type="text/javascript" src="jquery-easyui-1.3.3/jquery.min.js"></script>
+<script type="text/javascript" src="jquery-easyui-1.3.3/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="jquery-easyui-1.3.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript">
+var url;
+
+$(function(){
+	$("#dg2").datagrid({
+		onDblClickRow:function(rowIndex,rowData){
+		}
+	});
+})
+
+function searchGrade(){
+	$('#dg').datagrid('load',{
+		studentNo:$("#s_stuNo").val(),
+	});
+}
+
+function openGradeAddDialog(){
+	$("#dlg2").dialog("open").dialog("setTitle","添加学生成绩");
+	url="/StudentStatus/grade/save.do";
+}
+
+function openUserModifyDialog(){
+	var selectedRows=$("#dg").datagrid('getSelections');
+	if(selectedRows.length!=1){
+		$.messager.alert('系统提示','请选择一条要编辑的数据！');
+		return;
+	}
+	var row=selectedRows[0];
+	$("#dlg").dialog("open").dialog("setTitle","修改学生成绩");
+	$("#fm").form("load",row);
+	$("#userName").attr("readonly","readonly");
+	url="/StudentStatus/grade/save.do?id="+row.id;
+}
+
+function saveUser(){
+	$("#fm").form("submit",{
+		url:url,
+		onSubmit:function(){
+			return $(this).form("validate");
+		},
+		success:function(result){
+			var result=eval('('+result+')');
+			if(result.errorMsg){
+				$.messager.alert('系统提示',"<font color=red>"+result.errorMsg+"</font>");
+				return;
+			}else{
+				$.messager.alert('系统提示','保存成功');
+				closeUserAddDialog();
+				$("#dg").datagrid("reload");
+			}
+		}
+	});
+}
+
+function saveGrade(){
+	$("#fm2").form("submit",{
+		url:url,
+		onSubmit:function(){
+			return $(this).form("validate");
+		},
+		success:function(result){
+			var result=eval('('+result+')');
+			if(result.errorMsg){
+				$.messager.alert('系统提示',"<font color=red>"+result.errorMsg+"</font>");
+				return;
+			}else{
+				$.messager.alert('系统提示','保存成功');
+				closeGradeDialog();
+				$("#dg").datagrid("reload");
+			}
+		}
+	});
+}
+
+function closeUserAddDialog(){
+	$("#dlg").dialog("close");
+	$("#fm").form('clear');
+}
+
+
+function closeGradeDialog(){
+	$("#dlg2").dialog("close");
+	$("#fm").form('clear');
+}
+
+
+
+
+</script>
+</head>
+<body style="margin: 1px;">
+<table id="dg" title="成绩管理" class="easyui-datagrid" fitColumns="true" 
+    pagination="true" rownumbers="true" url="/StudentStatus/grade/getGrade.do" fit="true" toolbar="#tb">
+    <thead>
+    	<tr>
+    		<th field="cb" checkbox="true" align="center"></th>
+    		<th field="id" width="50" align="center">编号</th>
+    		<th field="studentName" width="120" align="center">姓名</th>
+    		<th field="studentNo" width="120" align="center">学号</th>
+    		<th field="subjectName" width="120" align="center">科目</th>
+    		<th field="score" width="120" align="center">成绩</th>
+
+    	</tr>
+    </thead>
+</table>
+<div id="tb">
+	<div>
+		<a href="javascript:openGradeAddDialog()" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
+		<a href="javascript:openUserModifyDialog()" class="easyui-linkbutton" iconCls="icon-edit" plain="true">修改</a>
+	</div>
+	<div>
+		&nbsp;学号：&nbsp;<input type="text" name="s_stuNo" id="s_stuNo" size="20" onkeydown="if(event.keyCode==13) searchGrade()"/>
+		<a href="javascript:searchGrade()" class="easyui-linkbutton" iconCls="icon-search" plain="true">查询学生成绩</a>
+	</div>
+</div>
+
+<div id="dlg" class="easyui-dialog" style="width: 570px;height: 350px;padding: 10px 20px"
+  closed="true" buttons="#dlg-buttons">
+  <form id="fm" method="post">
+  	<table cellspacing="5px;">
+  		<tr>
+  			<td>学生姓名：</td>
+  			<td><input type="text" id="studentName" name="studentName" class="easyui-validatebox" required="true" readonly="readonly"/></td>
+  			<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  			<td>学号：</td>
+  			<td><input type="text" id="studentNo" name="studentNo" class="easyui-validatebox" required="true" readonly="readonly"/></td>
+  		</tr>
+		<tr>
+  			<td>科目：</td>
+  			<td><input type="text" id="subjectName" name="subjectName" class="easyui-validatebox" required="true" readonly="readonly"/></td>
+  			<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  			<td>分数：</td>
+  			<td><input type="text" id="score" name="score" class="easyui-validatebox" required="true"/></td>
+  		</tr>
+
+  	</table>
+  </form>
+</div>
+
+<div id="dlg-buttons">
+	<a href="javascript:saveUser()" class="easyui-linkbutton" iconCls="icon-ok" >保存</a>
+	<a href="javascript:closeUserAddDialog()" class="easyui-linkbutton" iconCls="icon-cancel" >关闭</a>
+</div>
+
+
+<div id="dlg2" class="easyui-dialog" style="width: 570px;height: 350px;padding: 10px 20px"
+  closed="true" buttons="#dlg2-buttons">
+  <form id="fm2" method="post">
+  	<table cellspacing="5px;">
+  		<tr>
+  			<td>学生姓名：</td>
+  			<td><input type="text" id="studentName" name="studentName" class="easyui-validatebox" required="true"/></td>
+  			<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  			<td>学号：</td>
+  			<td><input type="text" id="studentNo" name="studentNo" class="easyui-validatebox" required="true"/></td>
+  		</tr>
+	  	<tr>
+  			<td>高数：</td>
+  			<td><input type="text" id="math" name="math" class="easyui-validatebox" required="true"/></td>
+  			<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  			<td>英语：</td>
+  			<td><input type="text" id="english" name="english" class="easyui-validatebox" required="true"/></td>
+  		</tr>
+  		<tr>
+  			<td>体育：</td>
+  			<td><input type="text" id="sport" name="sport" class="easyui-validatebox" required="true"/></td>
+  			<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  			<td>思想政治：</td>
+  			<td><input type="text" id="political" name="political" class="easyui-validatebox" required="true"/></td>
+  		</tr>
+  	</table>
+  </form>
+</div>
+
+<div id="dlg2-buttons">
+	<a href="javascript:saveGrade()" class="easyui-linkbutton" iconCls="icon-ok" >保存</a>
+	<a href="javascript:closeGradeDialog()" class="easyui-linkbutton" iconCls="icon-cancel" >关闭</a>
+</div>
+
+
+</body>
+</html>

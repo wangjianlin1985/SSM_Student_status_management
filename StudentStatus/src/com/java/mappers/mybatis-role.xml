@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.java.dao.RoleDao">  
+
+    <resultMap id="roleResultMap" type="com.java.entity.Role">  
+    	<result column="id" property="integer"/>
+        <result column="roleName" property="roleName" />  
+        <result column="authIds" property="authIds" />  
+        <result column="roleDescription" property="roleDescription" /> 
+    </resultMap>  
+
+  
+  <select id="getAuthIds" resultType="string">  
+    select 
+    authIds
+    from role
+    where roleId = #{roleId}  
+  </select>  
+  
+  
+   <select id="getRoleList" resultMap="roleResultMap">  
+   	 select * from role
+   		<if test ="role !=null">
+   			where roleName like CONCAT(CONCAT('%',#{role.roleName},'%'))
+    	</if>
+    	<if test ="pageBean !=null">
+   			limit #{pageBean.start} ,#{pageBean.rows}
+    	</if>
+  </select>  
+  
+  
+  <select id="getRoleListCount" resultType="int">  
+   	 select count(*) as total from role
+   		<if test ="role !=null">
+   			where roleName like CONCAT(CONCAT('%',#{role.roleName},'%'))
+    	</if>
+  </select>  
+  
+  <insert id="roleAdd" parameterType="role">
+    	insert into role values(null,#{role.roleName},'',#{role.roleDescription})
+  </insert>
+  
+  <update id="roleUpdate" parameterType="role">
+  		update role set roleName=#{role.roleName},roleDescription=#{role.roleDescription}
+  		 where roleId=#{role.roleId}
+  </update>
+  
+  <update id="roleAuthIdsUpdate" parameterType="role">
+  		update role set authIds=#{role.authIds}
+  		where roleId=#{role.roleId}
+  </update>
+  
+  <delete id="roleDelete">
+  		delete from role where roleId in 
+		<foreach collection="roleIds" open="(" close=")" separator="," item="roleid">
+		<if test="roleid!=''">
+			#{roleid}
+		</if>
+  		</foreach>
+  </delete>
+  
+</mapper>  

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.java.dao.StudentDao">  
+
+    <resultMap id="BaseResultMap" type="com.java.entity.Student">  
+    	<result column="id" property="id" />  
+        <result column="studentNo" property="studentNo" />  
+        <result column="studentName" property="studentName" />  
+        <result column="sex" property="sex" /> 
+       	<result column="deptNo" property="deptNo" /> 
+       	<result column="IdCard" property="IdCard" /> 
+       	<result column="address" property="address" /> 
+       	<result column="postcode" property="postcode" /> 
+       	<result column="state" property="state"/>
+       	<association property="dept" javaType="com.java.entity.Dept">
+        	<result column="deptName" property="deptName" /> 
+        </association>
+    </resultMap>  
+    
+    <select id="getStudentList" resultMap="BaseResultMap">  
+    	select * from student s ,dept d  where s.deptNo=d.deptNo 
+    	<if test ="student !=null">
+   			and s.studentNo like CONCAT(CONCAT('%',#{student.studentNo},'%'))
+    	</if>
+    	<if test ="pageBean !=null">
+   			limit #{pageBean.start} ,#{pageBean.rows}
+    	</if>
+  	</select>
+  	
+  	<select id="getStudentByStuNo" resultMap="BaseResultMap">
+  		select * from student where studentNo =#{studentNo}
+  	</select>
+  	
+  	<select id="getStudentCount" resultType="int">  
+    	select count(*) from student s ,dept d  where s.deptNo=d.deptNo 
+   		<if test ="student !=null">
+   			and s.studentNo like CONCAT(CONCAT('%',#{student.studentNo},'%'))
+    	</if>
+    </select>
+    
+    <select id="existStudentWithStudentNo" resultType="Integer">  
+    	select * from student where studentNo = #{studentNo}
+    </select>
+    
+    <select id="getStudentListByState" resultMap="BaseResultMap">
+    	select *from student s ,dept d where state = #{state} and s.deptNo=d.deptNo
+    	<if test ="pageBean !=null">
+   			limit #{pageBean.start} ,#{pageBean.rows}
+    	</if>
+    </select>
+    
+    <select id="getStudentListByStateCount" resultType="int">  
+    	select count(*) from student where state = #{state} 
+    </select>
+    
+    <update id="studentUpdate" parameterType="student">
+    	update student set 
+    	studentNo=#{student.studentNo},
+    	studentName=#{student.studentName},
+    	sex=#{student.sex},
+    	deptNo=#{student.deptNo},
+    	IdCard=#{student.IdCard},
+    	address=#{student.address},
+    	postcode=#{student.postcode}
+    	where id=#{student.id}
+    </update>
+    
+    <update id="studentUpdateState" parameterType="student">
+   		update student set state = #{student.state} where studentNo = #{student.studentNo}
+    </update>
+    
+    <!-- 1.不能毕业  2.可毕业 -->
+    <insert id="studentAdd" parameterType="student">
+    	insert into student values(null,
+    	#{student.studentNo},
+    	#{student.studentName},
+    	#{student.sex},
+    	#{student.deptNo},
+    	#{student.IdCard},
+    	#{student.address},
+    	#{student.postcode},1)
+    </insert>
+    
+    <delete id="studentDelete">
+    	delete from student where studentNo = #{studentNo} 	
+    </delete>
+ 	
+</mapper>  

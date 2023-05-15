@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.java.dao.DeptDao">  
+
+    <resultMap id="BaseResultMap" type="com.java.entity.Dept">  
+    	<result column="id" property="id" />  
+   		<result column="deptNo" property="deptNo" /> 
+       	<result column="deptName" property="deptName" /> 
+    </resultMap>  
+    
+    <select id="getDeptList" resultMap="BaseResultMap">  
+    	select * from dept
+    	<if test ="pageBean !=null">
+   			limit #{pageBean.start} ,#{pageBean.rows}
+    	</if>
+  	</select>
+  	
+  	<select id="getDeptCount" resultType="int">  
+    	select count(*) as total from dept
+    </select>
+    
+
+ 	
+</mapper>  
